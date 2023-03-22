@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
+import ru.practicum.ValidateException;
 import ru.practicum.ViewStats;
-import ru.practicum.WrongEndTimeException;
 import ru.practicum.mapper.StatMapper;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.StatRepository;
@@ -36,7 +36,7 @@ public class StatServiceImpl implements StatService {
             return Collections.emptyList();
         }
         if (end.isBefore(start)) {
-            throw new WrongEndTimeException("Incorrect end/start time.");
+            throw new ValidateException("End date can't be before start date");
         }
         List<ViewStats> stats;
         if (unique) {
