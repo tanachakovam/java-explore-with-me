@@ -40,9 +40,6 @@ public class StatServiceImpl implements StatService {
         } else {
             stats = statRepository.getStats(start, end, uris);
         }
-        if (uris == null) {
-            stats = statRepository.getFullStats(start, end);
-        }
         return stats;
     }
 }

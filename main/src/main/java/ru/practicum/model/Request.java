@@ -26,5 +26,6 @@ public class Request {
     @Column(name = "requester_id")
     private Long requester;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EventState status;
 }

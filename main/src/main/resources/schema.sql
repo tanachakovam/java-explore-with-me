@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS events
     participant_limit  BIGINT,
     published_on       TIMESTAMP WITHOUT TIME ZONE,
     request_moderation BOOLEAN,
-    state              VARCHAR(55),
+    state              VARCHAR(120),
     title              VARCHAR(120),
     views              BIGINT,
     FOREIGN KEY (location_id) REFERENCES locations (id),

@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.dto.category.CategoryDto;
-import ru.practicum.service.CategoryService;
 import ru.practicum.dto.compilation.CompilationDto;
-import ru.practicum.service.CompilationService;
-import ru.practicum.model.enums.SortParam;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.exception.ValidationException;
+import ru.practicum.model.enums.SortParam;
+import ru.practicum.service.CategoryService;
+import ru.practicum.service.CompilationService;
 import ru.practicum.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,13 +65,18 @@ public class PublicController {
                                          @RequestParam(name = "rangeStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                          @RequestParam(name = "rangeEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                          @RequestParam(name = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,
-                                         @RequestParam(name = "sort", required = false) SortParam sort,
+                                         @RequestParam(name = "sort", required = false) String sort,
                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
                                          HttpServletRequest request) {
+        SortParam sortParam = null;
+        if (sort != null) {
+            sortParam = SortParam.from(sort)
+                    .orElseThrow(() -> new ValidationException("Unknown sort parameter: " + sort));
+        }
         String ip = request.getRemoteAddr();
         String path = request.getRequestURI();
-        return eventService.getPublishedEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, PageRequest.of(from / size, size), ip, path);
+        return eventService.getPublishedEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sortParam, PageRequest.of(from / size, size), ip, path);
     }
 
 

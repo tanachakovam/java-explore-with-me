@@ -1,5 +1,6 @@
 package ru.practicum.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class Event {
     private LocalDateTime createdOn;
     private String description;
     @Column(name = "event_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     @JoinColumn(name = "initiator")
     @OneToOne(fetch = FetchType.LAZY)
@@ -43,6 +45,7 @@ public class Event {
     private LocalDateTime publishedOn;
     @Column(name = "request_moderation")
     private Boolean requestModeration;
+    @Enumerated(EnumType.STRING)
     private EventState state;
     private String title;
     private Long views;

@@ -2,30 +2,33 @@ package ru.practicum.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatsClient;
-import ru.practicum.mapper.EventMapper;
-import ru.practicum.model.*;
-import ru.practicum.model.Category;
-import ru.practicum.model.enums.EventState;
-import ru.practicum.model.enums.SortParam;
-import ru.practicum.repository.CategoryRepository;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.ValidationException;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.service.EventService;
-import ru.practicum.model.enums.StateAction;
-import ru.practicum.model.enums.StateActionAdmin;
 import ru.practicum.dto.request.UpdateEventAdminRequest;
 import ru.practicum.dto.request.UpdateEventUserRequest;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
+import ru.practicum.mapper.EventMapper;
+import ru.practicum.model.Category;
+import ru.practicum.model.Event;
 import ru.practicum.model.User;
+import ru.practicum.model.enums.EventState;
+import ru.practicum.model.enums.SortParam;
+import ru.practicum.model.enums.StateAction;
+import ru.practicum.model.enums.StateActionAdmin;
+import ru.practicum.repository.CategoryRepository;
+import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.UserRepository;
+import ru.practicum.service.EventService;
+import ru.practicum.service.EventSpecifications;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -43,7 +46,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventFullDto> getEvents(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable) {
-        Collection<Event> events = repository.findAllEvents(users, states, categories, rangeStart, rangeEnd, pageable);
+        Collection<Event> events;
+        Specification<Event> specification = EventSpecifications.getFilteredEventsForAdmin(users, states, categories, rangeStart, rangeEnd);
+        Page<Event> eventPage = repository.findAll(specification, pageable);
+        events = eventPage.getContent();
         return mapper.toEventFullDto(events);
     }
 
@@ -131,24 +137,15 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventShortDto> getPublishedEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortParam sort, Pageable pageable, String ip, String path) {
-
-
         Collection<Event> events;
 
-        if (onlyAvailable != null && onlyAvailable) {
-            events = repository.findAllAvailablePublishedEvents(text, categories, paid, rangeStart, rangeEnd, sort, EventState.PUBLISHED, pageable);
-            saveHit(ip, path);
-            for (Event event : events) {
-                event.setViews(event.getViews() + 1);
-            }
-        } else {
-            events = repository.findAllPublishedEvents(text, categories, paid, rangeStart, rangeEnd, sort, EventState.PUBLISHED, pageable);
-            saveHit(ip, path);
-            for (Event event : events) {
-                event.setViews(event.getViews() + 1);
-            }
+        Specification<Event> specification = EventSpecifications.getFilteredEvents(text, categories, paid, rangeStart, rangeEnd, sort, EventState.PUBLISHED, onlyAvailable);
+        Page<Event> eventPage = repository.findAll(specification, pageable);
+        events = eventPage.getContent();
+        saveHit(ip, path);
+        for (Event event : events) {
+            event.setViews(event.getViews() + 1);
         }
-
         return mapper.toEventShortDto(events);
     }
 
