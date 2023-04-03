@@ -11,7 +11,6 @@ import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.StatRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -32,9 +31,6 @@ public class StatServiceImpl implements StatService {
     @Override
     @Transactional(readOnly = true)
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        if (uris.isEmpty()) {
-            return Collections.emptyList();
-        }
         if (end.isBefore(start)) {
             throw new ValidateException("End date can't be before start date");
         }
@@ -44,7 +40,9 @@ public class StatServiceImpl implements StatService {
         } else {
             stats = statRepository.getStats(start, end, uris);
         }
-        System.out.println(stats);
+        if (uris == null) {
+            stats = statRepository.getFullStats(start, end);
+        }
         return stats;
     }
 }

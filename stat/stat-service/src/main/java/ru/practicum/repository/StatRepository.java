@@ -28,4 +28,12 @@ public interface StatRepository extends JpaRepository<EndpointHit, Integer> {
             "group by e.app, e.uri " +
             "order by count(e.ip) DESC")
     List<ViewStats> getStats(LocalDateTime from, LocalDateTime to, List<String> uris);
+
+    @Query("select new ru.practicum.ViewStats(e.app, e.uri, count(e.ip)) " +
+            " from EndpointHit e " +
+            "where e.timestamp >= ?1 " +
+            "and e.timestamp <= ?2 " +
+            "group by e.app, e.uri " +
+            "order by count(e.ip) DESC")
+    List<ViewStats> getFullStats(LocalDateTime from, LocalDateTime to);
 }
