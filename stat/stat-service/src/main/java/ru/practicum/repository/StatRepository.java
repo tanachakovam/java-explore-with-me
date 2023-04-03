@@ -1,6 +1,8 @@
 package ru.practicum.repository;
 
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.ViewStats;
 import ru.practicum.model.EndpointHit;
@@ -8,7 +10,7 @@ import ru.practicum.model.EndpointHit;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface StatRepository extends JpaRepository<EndpointHit, Integer> {
+public interface StatRepository extends JpaRepository<EndpointHit, Long>, JpaSpecificationExecutor<EndpointHit> {
 
     @Query("select new ru.practicum.ViewStats(e.app, e.uri, count(distinct e.ip)) " +
             "from EndpointHit e " +

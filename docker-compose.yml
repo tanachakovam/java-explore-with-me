@@ -6,18 +6,18 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - stats-db
+      - stat-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stat-db:5432/stat
 
 
   stats-db:
     image: postgres:14-alpine
-    container_name: stats-db
+    container_name: stat-db
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=stats
+      - POSTGRES_DB=stat
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 

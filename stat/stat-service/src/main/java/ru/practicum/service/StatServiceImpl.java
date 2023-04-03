@@ -42,4 +42,10 @@ public class StatServiceImpl implements StatService {
         }
         return stats;
     }
+
+
+      /*  Specification<EndpointHit> specification = StatSpecification.getFilteredHits(start, end, uris, unique);
+        List<ViewStats> stats = statRepository.findAll(specification);
+        return stats;
+    }*/
 }
