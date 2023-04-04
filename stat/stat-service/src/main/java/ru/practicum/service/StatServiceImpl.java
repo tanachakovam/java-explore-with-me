@@ -36,9 +36,17 @@ public class StatServiceImpl implements StatService {
         }
         List<ViewStats> stats;
         if (unique) {
-            stats = statRepository.getUniqueStats(start, end, uris);
+            if (uris == null || uris.isEmpty()) {
+                stats = statRepository.getUniqueStatsWithoutUris(start, end);
+            } else {
+                stats = statRepository.getUniqueStats(start, end, uris);
+            }
         } else {
-            stats = statRepository.getStats(start, end, uris);
+            if (uris == null || uris.isEmpty()) {
+                stats = statRepository.getStatsWithoutUris(start, end);
+            } else {
+                stats = statRepository.getStats(start, end, uris);
+            }
         }
         return stats;
     }
