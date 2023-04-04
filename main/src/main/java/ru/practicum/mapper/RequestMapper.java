@@ -1,8 +1,8 @@
 package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
-import ru.practicum.model.Request;
 import ru.practicum.dto.request.ParticipationRequestDto;
+import ru.practicum.model.Request;
 
 import java.util.List;
 

@@ -29,12 +29,10 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto saveCompilation(NewCompilationDto newCompilationDto) {
         List<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
-        Compilation compilation = new Compilation();
-        compilation.setTitle(newCompilationDto.getTitle());
-        compilation.setPinned(newCompilationDto.getPinned());
+        Compilation compilation = mapper.toCompilation(newCompilationDto);
         compilation.setEvents(new HashSet<>(events));
-        Compilation savedCompilation = repository.save(compilation);
-        return mapper.toCompilationDto(savedCompilation);
+
+        return mapper.toCompilationDto(repository.save(compilation));
     }
 
     @Override
@@ -49,12 +47,8 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilationDto) {
         Compilation compilationToUpdate = findCompilationById(compId);
 
-        if (compilationDto.getPinned() != null) {
-            compilationToUpdate.setPinned(compilationDto.getPinned());
-        }
-        if (compilationDto.getTitle() != null) {
-            compilationToUpdate.setTitle(compilationDto.getTitle());
-        }
+       mapper.update(compilationDto, compilationToUpdate);
+
         if (compilationDto.getEvents() != null) {
             List<Event> events = eventRepository.findAllByIdIn(compilationDto.getEvents());
             compilationToUpdate.setEvents(new HashSet<>(events));

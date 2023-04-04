@@ -27,8 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto addNewCategory(CategoryDto categoryDto) {
         checkCategoryName(categoryDto.getName());
         Category category = categoryMapper.toCategory(categoryDto);
-        Category addedCategory = categoryRepository.save(category);
-        return categoryMapper.toCategoryDto(addedCategory);
+        return categoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     @Override
@@ -45,8 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category categoryToUpdate = findCategoryById(catId);
         checkCategoryName(categoryDto.getName());
-        Category category = categoryMapper.toCategory(categoryDto);
-        categoryToUpdate.setName(category.getName());
+        categoryMapper.update(categoryDto, categoryToUpdate);
         categoryRepository.save(categoryToUpdate);
         return categoryMapper.toCategoryDto(categoryToUpdate);
     }

@@ -63,27 +63,12 @@ public class EventServiceImpl implements EventService {
                 throw new ValidationException("The event does not meet the editing rules.");
             }
         }
-        if (updateEventAdminRequest.getAnnotation() != null) {
-            event.setAnnotation(updateEventAdminRequest.getAnnotation());
+
+        if (updateEventAdminRequest.getCategory() != null) {
+            Category category = categoryRepository.findById(updateEventAdminRequest.getCategory()).orElseThrow(() -> new NotFoundException("Category is not found"));
+            event.setCategory(category);
         }
-        if (updateEventAdminRequest.getLocation() != null) {
-            event.setLocation(updateEventAdminRequest.getLocation());
-        }
-        if (updateEventAdminRequest.getPaid() != null) {
-            event.setPaid(updateEventAdminRequest.getPaid());
-        }
-        if (updateEventAdminRequest.getTitle() != null) {
-            event.setTitle(updateEventAdminRequest.getTitle());
-        }
-        if (updateEventAdminRequest.getDescription() != null) {
-            event.setDescription(updateEventAdminRequest.getDescription());
-        }
-        if (updateEventAdminRequest.getParticipantLimit() != null) {
-            event.setParticipantLimit(updateEventAdminRequest.getParticipantLimit());
-        }
-        if (updateEventAdminRequest.getRequestModeration() != null) {
-            event.setRequestModeration(updateEventAdminRequest.getRequestModeration());
-        }
+
         if (updateEventAdminRequest.getStateAction() != null) {
             if (updateEventAdminRequest.getStateAction().equals(StateActionAdmin.PUBLISH_EVENT)) {
                 if (event.getState().equals(EventState.PUBLISHED)) {
@@ -102,12 +87,14 @@ public class EventServiceImpl implements EventService {
                 event.setState(EventState.CANCELED);
             }
         }
+
         if (updateEventAdminRequest.getEventDate() != null) {
             if (updateEventAdminRequest.getEventDate().isBefore(LocalDateTime.now())) {
                 throw new ValidationException("Wrong event date.");
             }
             event.setEventDate(updateEventAdminRequest.getEventDate());
         }
+        mapper.update(updateEventAdminRequest, event);
         repository.save(event);
         return mapper.toEventFullDto(event);
     }
@@ -197,38 +184,24 @@ public class EventServiceImpl implements EventService {
             if (event.getPublishedOn() != null) {
                 throw new ValidationException("Only pending or canceled events can be changed.");
             }
-            if (updateEventUserRequest.getAnnotation() != null) {
-                event.setAnnotation(updateEventUserRequest.getAnnotation());
+            if (updateEventUserRequest.getCategory() != null) {
+                Category category = categoryRepository.findById(updateEventUserRequest.getCategory()).orElseThrow(() -> new NotFoundException("Category is not found"));
+                event.setCategory(category);
             }
-            if (updateEventUserRequest.getDescription() != null) {
-                event.setDescription(updateEventUserRequest.getDescription());
-            }
+
             if (updateEventUserRequest.getEventDate() != null) {
                 if (event.getEventDate().minusHours(2).isAfter(LocalDateTime.now())) {
                     throw new ValidationException("Only pending or canceled events can be changed.");
                 }
                 event.setEventDate(updateEventUserRequest.getEventDate());
             }
-            if (updateEventUserRequest.getLocation() != null) {
-                event.setLocation(updateEventUserRequest.getLocation());
-            }
-            if (updateEventUserRequest.getParticipantLimit() != null) {
-                event.setParticipantLimit(updateEventUserRequest.getParticipantLimit());
-            }
-            if (updateEventUserRequest.getRequestModeration() != null) {
-                event.setRequestModeration(updateEventUserRequest.getRequestModeration());
-            }
-            if (updateEventUserRequest.getPaid() != null) {
-                event.setPaid(updateEventUserRequest.getPaid());
-            }
-            if (updateEventUserRequest.getTitle() != null) {
-                event.setTitle(updateEventUserRequest.getTitle());
-            }
+
             if (updateEventUserRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
                 event.setState(EventState.PENDING);
             } else {
                 event.setState(EventState.CANCELED);
             }
+            mapper.updateEventOfUser(updateEventUserRequest, event);
             repository.save(event);
         }
         return mapper.toEventFullDto(event);
