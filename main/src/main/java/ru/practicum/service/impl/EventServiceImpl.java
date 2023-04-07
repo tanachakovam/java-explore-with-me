@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatsClient;
+import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
@@ -16,8 +17,10 @@ import ru.practicum.dto.request.UpdateEventAdminRequest;
 import ru.practicum.dto.request.UpdateEventUserRequest;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
+import ru.practicum.mapper.CommentMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Category;
+import ru.practicum.model.Comment;
 import ru.practicum.model.Event;
 import ru.practicum.model.User;
 import ru.practicum.model.enums.EventState;
@@ -25,12 +28,14 @@ import ru.practicum.model.enums.SortParam;
 import ru.practicum.model.enums.StateAction;
 import ru.practicum.model.enums.StateActionAdmin;
 import ru.practicum.repository.CategoryRepository;
+import ru.practicum.repository.CommentRepository;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.service.EventService;
 import ru.practicum.service.EventSpecifications;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,8 +43,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventMapper mapper;
+    private final CommentMapper commentMapper;
     private final EventRepository repository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final StatsClient statsClient;
 
@@ -47,10 +54,18 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<EventFullDto> getEvents(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable) {
         Collection<Event> events;
+        List<EventFullDto> eventsForAdmin = new ArrayList<>();
+        List<CommentDto> comments;
+
         Specification<Event> specification = EventSpecifications.getFilteredEventsForAdmin(users, states, categories, rangeStart, rangeEnd);
         Page<Event> eventPage = repository.findAll(specification, pageable);
         events = eventPage.getContent();
-        return mapper.toEventFullDto(events);
+
+        for (Event event : events) {
+            comments = getComments(event);
+            eventsForAdmin.add(mapper.toEventFullDto(event, comments));
+        }
+        return eventsForAdmin;
     }
 
 
@@ -94,7 +109,7 @@ public class EventServiceImpl implements EventService {
             }
             event.setEventDate(updateEventAdminRequest.getEventDate());
         }
-        mapper.update(updateEventAdminRequest, event);
+        mapper.mapAdminRequestToEvent(updateEventAdminRequest, event);
         repository.save(event);
         return mapper.toEventFullDto(event);
     }
@@ -105,12 +120,17 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public EventFullDto getPublishedEvent(Long id, String ip, String path) {
         saveHit(ip, path);
-
         Event event = repository.findEventByIdAndAndState(id, EventState.PUBLISHED);
+        List<CommentDto> comments = getComments(event);
+
         event.setViews(event.getViews() + 1);
-        return mapper.toEventFullDto(event);
+        return mapper.toEventFullDto(event, comments);
     }
 
+    private List<CommentDto> getComments(Event event) {
+        List<Comment> comments = commentRepository.findAllByEvent_Id(event.getId());
+        return commentMapper.toCommentDtoCollection(comments);
+    }
 
     private void saveHit(String ip, String path) {
         EndpointHitDto endpointHitDto = new EndpointHitDto();
@@ -125,22 +145,31 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<EventShortDto> getPublishedEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortParam sort, Pageable pageable, String ip, String path) {
         Collection<Event> events;
-
+        List<EventShortDto> publishedEvents = new ArrayList<>();
+        List<CommentDto> comments;
         Specification<Event> specification = EventSpecifications.getFilteredEvents(text, categories, paid, rangeStart, rangeEnd, sort, EventState.PUBLISHED, onlyAvailable);
         Page<Event> eventPage = repository.findAll(specification, pageable);
         events = eventPage.getContent();
         saveHit(ip, path);
         for (Event event : events) {
             event.setViews(event.getViews() + 1);
+            comments = getComments(event);
+            publishedEvents.add(mapper.toEventShortDto(event, comments));
         }
-        return mapper.toEventShortDto(events);
+        return publishedEvents;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EventShortDto> getEventsOfUser(Long userId, Pageable pageable) {
         Collection<Event> events = repository.findAllByInitiator_Id(userId, pageable);
-        return mapper.toEventShortDto(events);
+        List<EventShortDto> eventsOfUser = new ArrayList<>();
+        List<CommentDto> comments;
+        for (Event event : events) {
+            comments = getComments(event);
+            eventsOfUser.add(mapper.toEventShortDto(event, comments));
+        }
+        return eventsOfUser;
     }
 
     @Override
@@ -201,7 +230,7 @@ public class EventServiceImpl implements EventService {
             } else {
                 event.setState(EventState.CANCELED);
             }
-            mapper.updateEventOfUser(updateEventUserRequest, event);
+            mapper.mapUserRequestToEvent(updateEventUserRequest, event);
             repository.save(event);
         }
         return mapper.toEventFullDto(event);

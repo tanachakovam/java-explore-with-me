@@ -23,7 +23,7 @@ public interface CompilationMapper {
     @Mapping(target = "pinned", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "events", ignore = true)
-    void update(UpdateCompilationRequest updateCompilationRequest, @MappingTarget Compilation compilationToUpdate);
+    void map(UpdateCompilationRequest updateCompilationRequest, @MappingTarget Compilation compilationToUpdate);
 
     List<CompilationDto> toCompilationDto(List<Compilation> compilations);
 }

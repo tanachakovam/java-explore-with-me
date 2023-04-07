@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
@@ -28,17 +29,13 @@ public interface EventMapper {
 
     List<EventFullDto> toEventFullDto(Collection<Event> event);
 
-    @Mapping(target = "annotation", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "location", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "paid", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "requestModeration", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "participantLimit", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "eventDate", ignore = true)
-    @Mapping(target = "state", ignore = true)
-    @Mapping(target = "category", ignore = true)
-    void update(UpdateEventAdminRequest updateEventAdminRequest, @MappingTarget Event eventToUpdate);
+
+    @Mapping(target = "id", source = "event.id")
+    EventFullDto toEventFullDto(Event event, List<CommentDto> comments);
+
+    @Mapping(target = "id", source = "event.id")
+    EventShortDto toEventShortDto(Event event, List<CommentDto> comments);
+
 
     @Mapping(target = "annotation", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -50,7 +47,19 @@ public interface EventMapper {
     @Mapping(target = "eventDate", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "category", ignore = true)
-    void updateEventOfUser(UpdateEventUserRequest updateEventUserRequest, @MappingTarget Event eventToUpdate);
+    void mapAdminRequestToEvent(UpdateEventAdminRequest updateEventAdminRequest, @MappingTarget Event eventToUpdate);
+
+    @Mapping(target = "annotation", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "location", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "paid", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "requestModeration", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "participantLimit", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "eventDate", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    void mapUserRequestToEvent(UpdateEventUserRequest updateEventUserRequest, @MappingTarget Event eventToUpdate);
 }
 
 

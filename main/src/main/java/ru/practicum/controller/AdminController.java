@@ -7,17 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.category.CategoryDto;
-import ru.practicum.service.CategoryService;
+import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.compilation.CompilationDto;
-import ru.practicum.service.CompilationService;
 import ru.practicum.dto.compilation.NewCompilationDto;
-import ru.practicum.dto.request.UpdateCompilationRequest;
-import ru.practicum.model.enums.EventState;
 import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.service.EventService;
+import ru.practicum.dto.request.UpdateCompilationRequest;
 import ru.practicum.dto.request.UpdateEventAdminRequest;
 import ru.practicum.dto.user.UserDto;
-import ru.practicum.service.UserService;
+import ru.practicum.model.enums.EventState;
+import ru.practicum.service.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -34,6 +32,7 @@ public class AdminController {
     private final UserService userService;
     private final CompilationService compilationService;
     private final EventService eventService;
+    private final CommentService commentService;
 
 
     @PostMapping("/categories")
@@ -103,5 +102,20 @@ public class AdminController {
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long eventId, @RequestBody @Valid UpdateEventAdminRequest updateEventAdminRequest) {
         return eventService.updateEvent(eventId, updateEventAdminRequest);
+    }
+
+    @GetMapping("/search")
+    public List<CommentDto> search(@RequestParam(value = "text", required = false) String text,
+                                   @RequestParam(name = "rangeStart") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                   @RequestParam(name = "rangeEnd") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                   @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return commentService.search(text, rangeStart, rangeEnd, PageRequest.of(from / size, size));
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
     }
 }

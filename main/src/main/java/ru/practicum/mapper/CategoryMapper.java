@@ -19,5 +19,5 @@ public interface CategoryMapper {
     Category toCategory(CategoryDto categoryDto);
 
     @Mapping(target = "id", ignore = true)
-    void update(CategoryDto categoryDto, @MappingTarget Category category);
+    void map(CategoryDto categoryDto, @MappingTarget Category category);
 }

@@ -47,7 +47,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilationDto) {
         Compilation compilationToUpdate = findCompilationById(compId);
 
-       mapper.update(compilationDto, compilationToUpdate);
+       mapper.map(compilationDto, compilationToUpdate);
 
         if (compilationDto.getEvents() != null) {
             List<Event> events = eventRepository.findAllByIdIn(compilationDto.getEvents());

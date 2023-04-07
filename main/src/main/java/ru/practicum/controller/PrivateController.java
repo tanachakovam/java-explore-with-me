@@ -2,20 +2,22 @@
 package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.dto.comment.CommentDto;
+import ru.practicum.dto.comment.NewCommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.service.EventService;
-import ru.practicum.service.RequestService;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.dto.request.UpdateEventUserRequest;
+import ru.practicum.service.CommentService;
+import ru.practicum.service.EventService;
+import ru.practicum.service.RequestService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -26,10 +28,10 @@ import java.util.List;
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 @Validated
-@Slf4j
 public class PrivateController {
     private final EventService eventService;
     private final RequestService requestService;
+    private final CommentService commentService;
 
 
     @GetMapping("/{userId}/events")
@@ -64,7 +66,6 @@ public class PrivateController {
     public EventFullDto updateEventOfUser(@PathVariable Long userId,
                                           @PathVariable Long eventId,
                                           @RequestBody @Valid UpdateEventUserRequest updateEventUserRequest) {
-        log.info("updateEventOfUser with updateEventUserRequest {}", updateEventUserRequest);
         return eventService.updateEventOfUser(userId, eventId, updateEventUserRequest);
     }
 
@@ -91,5 +92,28 @@ public class PrivateController {
     public ParticipationRequestDto cancelRequest(@PathVariable Long userId, @PathVariable Long requestId) {
         return requestService.cancelRequest(userId, requestId);
     }
+
+    @PostMapping("/{userId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addNewComment(@PathVariable Long userId,
+                                    @RequestParam(name = "eventId") String eventId,
+                                    @RequestBody @Valid NewCommentDto commentDto) {
+        return commentService.addNewComment(userId, Long.parseLong(eventId), commentDto);
+    }
+
+    @DeleteMapping("/{userId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCommentByUser(@PathVariable Long userId, @PathVariable Long commentId) {
+        commentService.deleteCommentByUser(userId, commentId);
+    }
+
+    @PatchMapping("/{userId}/comments/{commentId}")
+    public CommentDto updateCommentByUser(@PathVariable Long userId, @PathVariable Long commentId, @RequestBody NewCommentDto commentDto) {
+        return commentService.updateCommentByUser(userId, commentId, commentDto);
+    }
+
+
+
+
 }
 
