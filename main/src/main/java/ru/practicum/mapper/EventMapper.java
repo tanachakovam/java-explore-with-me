@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -36,7 +37,6 @@ public interface EventMapper {
     @Mapping(target = "id", source = "event.id")
     EventShortDto toEventShortDto(Event event, List<CommentDto> comments);
 
-
     @Mapping(target = "annotation", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "location", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -49,6 +49,7 @@ public interface EventMapper {
     @Mapping(target = "category", ignore = true)
     void mapAdminRequestToEvent(UpdateEventAdminRequest updateEventAdminRequest, @MappingTarget Event eventToUpdate);
 
+
     @Mapping(target = "annotation", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "location", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -60,6 +61,7 @@ public interface EventMapper {
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "category", ignore = true)
     void mapUserRequestToEvent(UpdateEventUserRequest updateEventUserRequest, @MappingTarget Event eventToUpdate);
+
 }
 
 

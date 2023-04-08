@@ -6,18 +6,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.NewCommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
+
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.dto.request.UpdateEventUserRequest;
+
 import ru.practicum.service.CommentService;
 import ru.practicum.service.EventService;
 import ru.practicum.service.RequestService;
+
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -111,9 +115,5 @@ public class PrivateController {
     public CommentDto updateCommentByUser(@PathVariable Long userId, @PathVariable Long commentId, @RequestBody NewCommentDto commentDto) {
         return commentService.updateCommentByUser(userId, commentId, commentDto);
     }
-
-
-
-
 }
 
