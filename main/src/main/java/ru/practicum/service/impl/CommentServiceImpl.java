@@ -57,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteCommentByUser(Long userId, Long commentId) {
         Comment comment = repository.findById(commentId).orElseThrow(() -> new NotFoundException("Comment is not found"));
-        if (comment.getAuthor().getId() != userId) {
+        if (!comment.getAuthor().getId().equals(userId)) {
             throw new ValidationException("Only author of the comment can delete it.");
         }
         repository.deleteById(commentId);
@@ -67,7 +67,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDto updateCommentByUser(Long userId, Long commentId, NewCommentDto commentDto) {
         Comment comment = repository.findById(commentId).orElseThrow(() -> new NotFoundException("Comment is not found"));
-        if (comment.getAuthor().getId() != userId) {
+        if (!comment.getAuthor().getId().equals(userId)) {
             throw new ValidationException("Only author of the comment can change it.");
         }
 
