@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -13,7 +12,6 @@ import ru.practicum.dto.request.UpdateEventAdminRequest;
 import ru.practicum.dto.request.UpdateEventUserRequest;
 import ru.practicum.model.Event;
 
-import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -24,11 +22,7 @@ public interface EventMapper {
 
     EventFullDto toEventFullDto(Event event);
 
-    List<EventShortDto> toEventShortDto(Collection<Event> event);
-
     EventShortDto toEventShortDto(Event event);
-
-    List<EventFullDto> toEventFullDto(Collection<Event> event);
 
 
     @Mapping(target = "id", source = "event.id")

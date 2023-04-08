@@ -86,18 +86,18 @@ public class EventServiceImpl implements EventService {
         }
 
         if (updateEventAdminRequest.getStateAction() != null) {
-            if (updateEventAdminRequest.getStateAction().equals(StateActionAdmin.PUBLISH_EVENT)) {
-                if (event.getState().equals(EventState.PUBLISHED)) {
+            if (StateActionAdmin.PUBLISH_EVENT.equals(updateEventAdminRequest.getStateAction())) {
+                if (EventState.PUBLISHED.equals(event.getState())) {
                     throw new ValidationException("The event was already published.");
                 }
-                if (event.getState().equals(EventState.CANCELED)) {
+                if (EventState.CANCELED.equals(event.getState())) {
                     throw new ValidationException("The event was cancelled.");
                 }
                 event.setState(EventState.PUBLISHED);
                 event.setPublishedOn(LocalDateTime.now());
                 event.setViews(0L);
             } else {
-                if (event.getState().equals(EventState.PUBLISHED)) {
+                if (EventState.PUBLISHED.equals(event.getState())) {
                     throw new ValidationException("The event was already published and can not be cancelled.");
                 }
                 event.setState(EventState.CANCELED);
@@ -230,7 +230,7 @@ public class EventServiceImpl implements EventService {
                 event.setEventDate(updateEventUserRequest.getEventDate());
             }
 
-            if (updateEventUserRequest.getStateAction() != null && updateEventUserRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
+            if (updateEventUserRequest.getStateAction() != null && StateAction.SEND_TO_REVIEW.equals(updateEventUserRequest.getStateAction())) {
                 event.setState(EventState.PENDING);
             } else {
                 event.setState(EventState.CANCELED);

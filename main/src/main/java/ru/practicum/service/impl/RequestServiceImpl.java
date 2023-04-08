@@ -40,7 +40,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ValidationException("Initiator of the event can't be participant.");
         }
 
-        if (!event.getState().equals(EventState.PUBLISHED)) {
+        if (!EventState.PUBLISHED.equals(event.getState())) {
             throw new ValidationException("Participation in unpublished event is impossible.");
         }
 
@@ -103,7 +103,7 @@ public class RequestServiceImpl implements RequestService {
         }
         List<ParticipationRequestDto> participationRequestDtos = requestMapper.toRequestDto(requestRepository.findAllById(eventRequestStatusUpdateRequest.getRequestIds()));
 
-        if (eventRequestStatusUpdateRequest.getStatus().equals(RequestStatus.CONFIRMED)) {
+        if (RequestStatus.CONFIRMED.equals(eventRequestStatusUpdateRequest.getStatus())) {
             for (ParticipationRequestDto participationRequestDto : participationRequestDtos) {
                 participationRequestDto.setStatus("CONFIRMED");
                 event.setConfirmedRequests(event.getConfirmedRequests() + 1);
