@@ -82,3 +82,4 @@ CREATE TABLE IF NOT EXISTS comments
     FOREIGN KEY (event_id) REFERENCES events (id),
     FOREIGN KEY (author_id) REFERENCES users (id)
 );
+

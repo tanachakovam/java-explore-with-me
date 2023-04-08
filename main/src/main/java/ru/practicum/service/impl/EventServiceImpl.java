@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatsClient;
+
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -110,6 +111,7 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(updateEventAdminRequest.getEventDate());
         }
         mapper.mapAdminRequestToEvent(updateEventAdminRequest, event);
+
         repository.save(event);
         return mapper.toEventFullDto(event);
     }
@@ -132,6 +134,7 @@ public class EventServiceImpl implements EventService {
         return commentMapper.toCommentDtoCollection(comments);
     }
 
+
     private void saveHit(String ip, String path) {
         EndpointHitDto endpointHitDto = new EndpointHitDto();
         endpointHitDto.setIp(ip);
@@ -147,6 +150,7 @@ public class EventServiceImpl implements EventService {
         Collection<Event> events;
         List<EventShortDto> publishedEvents = new ArrayList<>();
         List<CommentDto> comments;
+
         Specification<Event> specification = EventSpecifications.getFilteredEvents(text, categories, paid, rangeStart, rangeEnd, sort, EventState.PUBLISHED, onlyAvailable);
         Page<Event> eventPage = repository.findAll(specification, pageable);
         events = eventPage.getContent();
@@ -170,6 +174,7 @@ public class EventServiceImpl implements EventService {
             eventsOfUser.add(mapper.toEventShortDto(event, comments));
         }
         return eventsOfUser;
+
     }
 
     @Override
@@ -230,7 +235,9 @@ public class EventServiceImpl implements EventService {
             } else {
                 event.setState(EventState.CANCELED);
             }
+
             mapper.mapUserRequestToEvent(updateEventUserRequest, event);
+
             repository.save(event);
         }
         return mapper.toEventFullDto(event);

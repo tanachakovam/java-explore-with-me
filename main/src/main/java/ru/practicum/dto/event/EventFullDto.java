@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.model.enums.EventState;
 import ru.practicum.model.Location;
@@ -13,6 +14,7 @@ import ru.practicum.dto.user.UserShortDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Data
 @Builder

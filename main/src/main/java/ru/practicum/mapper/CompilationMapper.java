@@ -25,5 +25,6 @@ public interface CompilationMapper {
     @Mapping(target = "events", ignore = true)
     void map(UpdateCompilationRequest updateCompilationRequest, @MappingTarget Compilation compilationToUpdate);
 
+
     List<CompilationDto> toCompilationDto(List<Compilation> compilations);
 }
