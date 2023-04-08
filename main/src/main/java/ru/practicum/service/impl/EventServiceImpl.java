@@ -225,7 +225,7 @@ public class EventServiceImpl implements EventService {
                 event.setEventDate(updateEventUserRequest.getEventDate());
             }
 
-            if (updateEventUserRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
+            if (updateEventUserRequest.getStateAction() != null && updateEventUserRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
                 event.setState(EventState.PENDING);
             } else {
                 event.setState(EventState.CANCELED);
